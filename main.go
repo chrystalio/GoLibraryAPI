@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
@@ -18,7 +19,10 @@ func main() {
 		IdleTimeout:  5 * time.Second,
 	}
 
-	s.ListenAndServe()
+	log.Println("Starting server on :3000")
+	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatal("Server startup failed!")
+	}
 }
 
 func hello(w http.ResponseWriter, req *http.Request) {
