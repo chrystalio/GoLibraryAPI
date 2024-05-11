@@ -1,27 +1,38 @@
 package main
 
 import (
-	"GoLibraryAPI/api/router"
-	"GoLibraryAPI/config"
 	"fmt"
 	"log"
 	"net/http"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
+
+	"GoLibraryAPI/api/router"
+	"GoLibraryAPI/config"
 )
 
-//  @title          GoLibraryAPI
-//  @version        1.0
-//  @description    This is a Restful API service for a library application made with Go.
-
-//  @contact.name   Chrystalio
-//  @contact.url    https://kristoff-dev.space
-
-//  @host       localhost:3000
-//  @basePath   /v1
+const fmtDBString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
 
 func main() {
-
 	c := config.New()
-	r := router.New()
+
+	var logLevel gormlogger.LogLevel
+	if c.DB.Debug {
+		logLevel = gormlogger.Info
+	} else {
+		logLevel = gormlogger.Error
+	}
+
+	dbString := fmt.Sprintf(fmtDBString, c.DB.Host, c.DB.Username, c.DB.Password, c.DB.DBName, c.DB.Port)
+	db, err := gorm.Open(postgres.Open(dbString), &gorm.Config{Logger: gormlogger.Default.LogMode(logLevel)})
+	if err != nil {
+		log.Fatal("DB connection start failure")
+		return
+	}
+
+	r := router.New(db)
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%d", c.Server.Port),
 		Handler:      r,
@@ -30,8 +41,8 @@ func main() {
 		IdleTimeout:  c.Server.TimeoutIdle,
 	}
 
-	log.Println("Starting server on :3000")
+	log.Println("Starting server " + s.Addr)
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatal("Server startup failed!")
+		log.Fatal("Server startup failed")
 	}
 }
