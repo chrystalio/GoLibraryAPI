@@ -2,12 +2,13 @@ package router
 
 import (
 	"github.com/go-chi/chi/v5"
+	"gorm.io/gorm"
 
 	"GoLibraryAPI/api/resource/book"
 	"GoLibraryAPI/api/resource/health"
 )
 
-func New() *chi.Mux {
+func New(db *gorm.DB) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Get("/status", health.Read)
