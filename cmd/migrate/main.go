@@ -8,11 +8,13 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
+
+	"GoLibraryAPI/config"
 )
 
 const (
-	dialect  = "pgx"
-	dbString = "host=localhost user=root password=root dbname=golibraryapi_db port=5432 sslmode=disable"
+	dialect     = "pgx"
+	fmtDBString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
 )
 
 var (
@@ -21,6 +23,7 @@ var (
 )
 
 func main() {
+	// Set up command-line flags and usage
 	flags.Usage = usage
 	flags.Parse(os.Args[1:])
 
@@ -32,23 +35,32 @@ func main() {
 
 	command := args[0]
 
+	// Load database configuration
+	cfg := config.NewDB()
+
+	// Format database connection string
+	dbString := fmt.Sprintf(fmtDBString, cfg.Host, cfg.Username, cfg.Password, cfg.DBName, cfg.Port)
+
+	// Open database connection
 	db, err := goose.OpenDBWithDriver(dialect, dbString)
 	if err != nil {
-		log.Fatalf(err.Error())
+		log.Fatalf("failed to connect to database: %v", err)
 	}
-
 	defer func() {
+		// Close database connection
 		if err := db.Close(); err != nil {
-			log.Fatalf(err.Error())
+			log.Fatalf("failed to close database connection: %v", err)
 		}
 	}()
 
+	// Run migration command
 	if err := goose.Run(command, db, *dir, args[1:]...); err != nil {
 		log.Fatalf("migrate %v: %v", command, err)
 	}
 }
 
 func usage() {
+	// Print usage information
 	fmt.Println(usagePrefix)
 	flags.PrintDefaults()
 	fmt.Println(usageCommands)

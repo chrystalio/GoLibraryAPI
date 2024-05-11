@@ -1,22 +1,26 @@
 package main
 
 import (
+	"GoLibraryAPI/config"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"time"
 )
 
 func main() {
+
+	c := config.New()
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hello", hello)
 
 	s := &http.Server{
-		Addr:         ":3000",
+		Addr:         fmt.Sprintf(":%d", c.Server.Port),
 		Handler:      mux,
-		ReadTimeout:  2 * time.Second,
-		WriteTimeout: 2 * time.Second,
-		IdleTimeout:  5 * time.Second,
+		ReadTimeout:  c.Server.TimeoutRead,
+		WriteTimeout: c.Server.TimeoutWrite,
+		IdleTimeout:  c.Server.TimeoutIdle,
 	}
 
 	log.Println("Starting server on :3000")
