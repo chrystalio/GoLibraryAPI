@@ -8,6 +8,16 @@ import (
 	"net/http"
 )
 
+//  @title          GoLibraryAPI
+//  @version        1.0
+//  @description    This is a Restful API service for a library application made with Go.
+
+//  @contact.name   Chrystalio
+//  @contact.url    https://kristoff-dev.space
+
+//  @host       localhost:3000
+//  @basePath   /v1
+
 func main() {
 
 	c := config.New()
