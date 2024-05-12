@@ -1,6 +1,8 @@
 package book
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"gorm.io/gorm"
@@ -26,7 +28,23 @@ func New(db *gorm.DB) *API {
 //	@success        200 {array}     DTO
 //	@failure        500 {object}    err.Error
 //	@router         /books [get]
-func (a *API) List(w http.ResponseWriter, r *http.Request) {}
+func (a *API) List(w http.ResponseWriter, r *http.Request) {
+	books, err := a.repository.List()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if len(books) == 0 {
+		fmt.Fprint(w, "[]")
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(books.ToDto()); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
 
 // Create godoc
 //
