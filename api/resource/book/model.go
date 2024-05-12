@@ -37,3 +37,23 @@ type Book struct {
 }
 
 type Books []*Book
+
+func (b *Book) ToDto() *DTO {
+	return &DTO{
+		ID:            b.ID.String(),
+		Title:         b.Title,
+		Author:        b.Author,
+		PublishedDate: b.PublishedDate.Format("2006-01-02"),
+		ImageURL:      b.ImageURL,
+		Description:   b.Description,
+	}
+}
+
+func (bs Books) ToDto() []*DTO {
+	dtos := make([]*DTO, len(bs))
+	for i, v := range bs {
+		dtos[i] = v.ToDto()
+	}
+
+	return dtos
+}
