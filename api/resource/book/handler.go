@@ -33,7 +33,7 @@ func New(db *gorm.DB) *API {
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
 	books, err := a.repository.List()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// handle later
 		return
 	}
 
@@ -43,7 +43,7 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(books.ToDto()); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// handle later
 		return
 	}
 }
