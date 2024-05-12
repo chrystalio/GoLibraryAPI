@@ -38,6 +38,18 @@ type Book struct {
 
 type Books []*Book
 
+func (f *Form) ToModel() *Book {
+	pubDate, _ := time.Parse("2006-01-02", f.PublishedDate)
+
+	return &Book{
+		Title:         f.Title,
+		Author:        f.Author,
+		PublishedDate: pubDate,
+		ImageURL:      f.ImageURL,
+		Description:   f.Description,
+	}
+}
+
 func (b *Book) ToDto() *DTO {
 	return &DTO{
 		ID:            b.ID.String(),
