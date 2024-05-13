@@ -11,12 +11,14 @@ import (
 
 	"GoLibraryAPI/api/router"
 	"GoLibraryAPI/config"
+	validatorUil "GoLibraryAPI/util/validator"
 )
 
 const fmtDBString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
 
 func main() {
 	c := config.New()
+	v := validatorUil.New()
 
 	var logLevel gormlogger.LogLevel
 	if c.DB.Debug {
@@ -32,7 +34,7 @@ func main() {
 		return
 	}
 
-	r := router.New(db)
+	r := router.New(db, v)
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%d", c.Server.Port),
 		Handler:      r,
